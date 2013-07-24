@@ -1,0 +1,13 @@
+<html>
+<script type="text/javascript">
+chrome.tabs.onUpdated.addListener(function(id, cinfo, tab) {
+    var s = "http://www.renren.com/";
+    if(tab.url.substr(0, s.length) == s) {
+        chrome.pageAction.show(id);
+    }
+});
+chrome.pageAction.onClicked.addListener(function(tab) {
+    chrome.tabs.create({ "url": "xnana.html" });
+});
+</script>
+</html>

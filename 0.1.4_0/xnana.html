@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>xnanalysis</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="jsfr.js"></script>
+    <style type="text/css">
+/* first, reset all styles. */
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,
+a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,
+small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,
+form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;
+border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent;}
+body{line-height:1;}ol,ul{list-style:none;}blockquote,q{quotes:none;}
+blockquote:before,blockquote:after,q:before,q:after{content:'';content:none;}
+:focus{outline:0;}ins{text-decoration:none;}del{text-decoration: line-through;}
+table{border-collapse:collapse;border-spacing:0;}
+/* clearfix hack. */
+.group:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
+.group{display:inline-block;}* html .group{height:1%;}.group{display:block;}
+.display-none{display:none;}
+body {
+    -webkit-text-size-adjust:none;
+    font-size: 15px;
+    padding: 1em;
+}
+h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 1em 0;
+}
+h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 1em 0;
+}
+p {
+    margin: 1em 0;
+}
+ul {
+    padding-left: 3em;
+    list-style-type: disc;
+}
+li {
+    line-height: 18px;
+}
+
+#status .error { color: red; }
+#status .title { font-weight: bold; font-size: 1.1em; }
+#status .info { font-size: 0.9em; padding-left: 1em; }
+#status { list-style-type: none; padding-left: 2em; }
+#requestData { width: 330px; height: 100px; }
+#topmenu {
+    z-index: 10000;
+    border-bottom: 1px solid rgba(200,200,200,0.8);
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 20px;
+    background-color: rgba(250,250,250,0.8);
+}
+#topmenu > a:hover,#topmenu a:active {
+    background-color: rgba(200,200,200,0.6);
+    text-shadow: 0px 1px rgba(255,255,255,1);
+}
+#topmenu > a {
+    display: inline-block;
+    height: 20px;
+    line-height: 20px;
+    padding: 0 8px;
+    background-color: rgba(240,240,240,0.6);
+    color: black;
+    text-decoration: none;
+}
+#clickMe:hover, #clickMe:active {
+    background-color: rgba(200,200,200,0.6);
+    text-shadow: 0px 1px rgba(255,255,255,1);
+    color: black;
+}
+#clickMe {
+    display: inline-block;
+    width: 10em;
+    height: 3em;
+    line-height: 3em;
+    text-decoration: none;
+    background-color: rgba(240,240,240,0.6);
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid black;
+}
+#rightPanel {
+    float: right;
+    width: 400px;
+}
+#leftPanel {
+    max-width: 600px;
+}
+.page_tab {
+    padding-top: 20px;
+}
+#tab_gather_data {
+    max-width: 1200px;
+    margin: 0px auto;
+}
+a:hover, a:active {
+    color: blue;
+}
+a {
+    color: black;
+    text-decoration: underline;
+}
+#resultsTable tr {
+    line-height: 18px;
+}
+#resultsTable {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
+}
+#resultsTable td.controls {
+    width: 120px;
+    text-align: center;
+}
+#resultsTable td {
+    border-bottom : 1px solid gray;
+}
+#resultsTable tr a:hover, #resultsTable tr a:active { color: blue; }
+#resultsTable tr a { color: black;  text-decoration: none; display: none; }
+#resultsTable tr:hover a { display: inline; }
+#resultsTable td {
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+}
+#resultsTable tr:hover{color:blue;}
+.noscroll { overflow: hidden !important; }
+#edgebw {
+    z-index: 100000;
+    position:fixed;
+    top: 0px;
+    right: 320px;
+    background-color: rgba(255,255,255,0.8);
+}
+#edgebw .controls {
+}
+#edgebw .controls a.button:hover, #edgebw .controls a.button:active {
+    text-shadow: 0 1px white;
+    background-color: #DDD;
+}
+#edgebw .controls a.button {
+    height: 20px;
+    line-height: 20px;
+    padding: 0 8px;
+    display: inline-block;
+    background-color: #EEE;
+    text-decoration: none;
+    color: black;
+}
+#tab_graph {
+    -webkit-user-select: none;
+    font-size: 13px;
+}
+#canvas_mask {
+    position: absolute;
+    left: 0; top: 0;
+    z-index: 10;
+}
+.invisible { display: none; }
+#middle_layer {
+    position: absolute;
+    left: 0; top: 0;
+    background-color: rgba(255, 255, 255, 0.5);
+    z-index: 5;
+}
+#canvas_graph {
+    position: absolute;
+    left: 0; top: 0;
+    z-index: 1;
+}
+#canvas_holder {
+    overflow: hidden;
+    position: relative;
+}
+#canvas_images div {
+    position: absolute;
+    z-index: 20;
+}
+#canvas_images div.inactive {
+    z-index: 3;
+}
+#canvas_images span {
+    -webkit-transition: all 0.1s ease-out;
+    display: block;
+    font-size: 11px;
+    line-height: 15px;
+    margin: 0; padding: 0;
+    padding-left: 4px;
+    padding-right: 4px;
+    overflow: visible;
+    word-break: keep-all;
+}
+#canvas_images > div {
+    position: absolute;
+    width: 10em;
+}
+#canvas_images > div > div {
+    -webkit-transition: all 0.1s ease-out;
+    left: -11px;
+    top: -11px;
+}
+#canvas_images > div:hover {
+    z-index: 100;
+}
+#canvas_images > div:hover > div {
+    z-index: 100;
+    left: -18px;
+    top: -18px;
+}
+#canvas_images > div.selected > div > span {
+    color: rgba(31,119,180,1);
+}
+#canvas_images > div:hover > div span {
+    background-color: rgba(255,255,255,0.8);
+}
+#canvas_images > div.selected {
+    z-index: 100;
+}
+#canvas_images > div:hover > div img {
+    box-shadow: 0 0 4px rgba(255,127,14,1);
+    max-width: 36px;
+    max-height: 36px;
+}
+#canvas_images > div.selected img {
+    box-shadow: 0 0 4px rgba(255,127,14,1);
+}
+#canvas_images img {
+    -webkit-transition: all 0.1s ease-out;
+    box-shadow: 0 0 4px black;
+    max-width: 22px;
+    max-height: 22px;
+    display: block;
+    margin: 0; padding: 0;
+}
+#canvas_images {
+    position: absolute;
+    left: 0; top: 0;
+}
+    </style>
+</head>
+<body>
+<div id="topmenu">
+    <a href="#" onclick="swtab('gather_data'); return false;">获取数据</a>
+    <a href="#" onclick="swtab('graph'); return false;">好友关系图</a>
+    <div style="float:right;display:inline-block;padding-right: 1em;padding-top: 3px;font-size: 12px;">version 0.1.4, copyright 2010-2011 <a href="http://www.windwish.net" target="_blank">windwish.net</a></div>
+</div>
+<div id="tab_gather_data" class="page_tab">
+    <div id="rightPanel">
+        <h3>以前的结果</h3>
+        <table id="resultsTable"></table>
+    </div>
+    <div id="leftPanel">
+    <h2>XNAnalysis - 好友关系可视化工具</h2>
+    <p>本应用可以将您在人人网的好友们的关系绘制成一个网络。</p>
+    <h3>使用需知</h3>
+    <ul>
+        <li>本程序将通过浏览器收集您在人人网中的好友列表、好友之间的关系这些信息。</li>
+        <li>使用本程序产生的任何后果请自行承担。</li>
+    </ul>
+    <h3>致谢</h3>
+    <ul>
+        <li><a target="_blank" href="http://citeseer.ist.psu.edu/viewdoc/download;jsessionid=19A8857540E8C9C26397650BBACD5311?doi=10.1.1.13.8444&rep=rep1&type=pdf">Fruchterman Reingold</a> 算法的实现参考自 <a target="_blank" href="http://gephi.org/">Gephi</a> 的源代码。</li>
+    </ul>
+    <h3>从这里开始</h3>
+    <p><b><a id="clickMe" onclick="xnana_run(); return false;" href="#">点击这里开始</a></b></p>
+    <h3>当前状态</h3>
+    <ul id="status">
+        <li>请点击“点击这里开始”</li>
+    </ul>
+    </div>
+</div>
+<div id="tab_graph" class="page_tab" style="display:none">
+    <div id="edgebw">
+        <div class="controls">
+            <a id="redraw-graph" href="#" onclick="" class="button">重绘</a>
+            <a id="save-copy" href="#" onclick="" class="button">存储</a>
+            <a id="save-png" href="#" onclick="" class="button">保存图片</a>
+        </div>
+    </div>
+
+    <div id="canvas_holder">
+        <canvas width="100px" height="100px" id="canvas_mask"></canvas>
+        <div id="middle_layer" class="invisible"></div>
+        <canvas width="100px" height="100px" id="canvas_graph"></canvas>
+        <div id="canvas_images"></div>
+    </div>
+</div>
+<canvas style="display:none;" id="canvas_hidden"></canvas>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+var g_graphdata;
+function post_status(s, k) {
+    var ol = document.getElementById("status");
+    var x = document.createElement("li");
+    if(k == undefined) {
+        x.innerHTML = s;
+    } else x.innerHTML = '<span class="'+k+'">'+s+'</span>';
+    ol.appendChild(x);
+}
+function xnana_run() {
+    document.getElementById("status").innerHTML = "";
+    post_status("步骤 1/4: 正在请求好友列表...", "title");
+    var s = $.get("http://friend.renren.com/myfriendlistx.do", {}, function(s) {
+        var friends = new Array();
+        var edges = new Array();
+        var map = {};
+        var pos1 = s.indexOf("var friends=") + 12;
+        var pos2 = s.indexOf("var hotfriends=");
+        var json = s.substr(pos1, pos2 - pos1);
+        pos2 = json.lastIndexOf(";");
+        json = json.substr(0, pos2);
+        var obj = JSON.parse(json);
+        for(i in obj) {
+            if(i >= 20000) {
+                // too many...
+                post_status("好友数量过多，限定在2000。", "info");
+                break;
+            }
+            var user = obj[i];
+            friends[i] = [user.id, user.name, user.head, user.groups];
+            map[user.id] = i;
+        }
+        pos1 = s.indexOf("XN.user.id = '"); pos1 += 14;
+        pos2 = pos1;
+        while(s[pos2].charCodeAt(0) >= "0".charCodeAt(0) && s[pos2].charCodeAt(0) <= "9".charCodeAt(0))
+            pos2 = pos2 + 1;
+        var uid = s.substr(pos1, pos2 - pos1);
+        post_status("[完成] 找到 " + friends.length + " 个好友。", "info");
+        post_status("步骤 2/4: 正在获取好友关系...", "title");
+        post_status('这需要一定时间，请耐心等待，不要刷新本页面... [<span class="progress"></span>]', "info");
+        var idx = 0;
+        var getting_ = false;
+        var timer = setInterval(function() {
+            if(getting_) return;
+            if(idx >= friends.length) {
+                clearInterval(timer);
+                var medges = [];
+                for(var e = 0; e < edges.length; e++) {
+                    post_status([map[edges[e][0]]+' -> '+map[edges[e][1]]],'info');
+                    medges.push([map[edges[e][0]], map[edges[e][1]]]);
+                }
+                var request_obj = {
+                    friends: friends,
+                    edges: edges,
+                    mapped_edges: medges
+                };
+                $(".progress").removeClass("progress").html("完成");
+                xnana_layout(request_obj);
+                return;
+            }
+            var url = "http://friend.renren.com/shareFriends?&p=";
+            url += JSON.stringify({"uid":"true", "param":{"guest":friends[idx][0]}});
+            getting_ = true;
+            $.get(url, {}, function(g) {
+                var obj = JSON.parse(g).candidate;
+                for(i in obj) {
+                    var entity = obj[i];
+                    var j = map[entity.id];
+                    if(j != undefined){
+                        edges.push([friends[idx][0], entity.id]);
+                        
+                   		 post_status([friends[idx][0]+' -> '+entity.id],'info');
+                     }
+                }
+                post_status("&-------------------------------------",'info');
+                idx++;
+                $(".progress").html(idx + "/" + friends.length);
+                getting_ = false;
+            });
+        }, 10);
+    });
+}
+function get_date_string() { 
+    var date = new Date();
+    mon = date.getMonth().toString();
+    if(mon.length < 2) mon = "0" + mon;
+    day = date.getDate().toString();
+    if(day.length < 2) day = "0" + day;
+    hh = date.getHours().toString();
+    if(hh.length < 2) hh = "0" + hh;
+    mm = date.getMinutes().toString();
+    if(mm.length < 2) mm = "0" + mm;
+    ss = date.getSeconds().toString();
+    if(ss.length < 2) ss = "0" + ss;
+    s = date.getFullYear() + "-" + mon + "-" + day + "-" + hh+mm+ss;
+    return s;
+}
+function xnana_layout(req) {
+    var n = req.friends.length;
+    var edges = req.mapped_edges;
+    post_status("步骤 3/4: 正在生成好友网络...", "title");
+    post_status('这需要一定时间，请耐心等待，不要刷新本页面... [<span class="progress"></span>]', "info");
+    var R = [];
+    var onlayoutend = function() {
+        // Rescale.
+        var minx = 1e10, miny = 1e10, maxx = -1e10, maxy = -1e10;
+        var mind = 1e10;
+        for(var i = 0; i < n; i++) {
+            minx = Math.min(minx, R[i][0]);
+            maxx = Math.max(maxx, R[i][0]);
+            miny = Math.min(miny, R[i][1]);
+            maxy = Math.max(maxy, R[i][1]);
+        }
+        var deltax = 100;
+        var deltay = 100;
+        minx -= deltax;
+        miny -= deltay;
+        maxx += deltax;
+        maxy += deltay;
+        for(var i = 0; i < n; i++) {
+            R[i][0] -= minx;
+            R[i][1] -= miny;
+        }
+        var g_graphdata = {};
+        g_graphdata.friends = req.friends;
+        g_graphdata.layout = {
+            g_width : maxx - minx,
+            g_height : maxy - miny,
+            n_edges : edges.length,
+            n_nodes : req.friends.length,
+            n_data : R,
+            e_data : edges
+        };
+        var rindex = localStorage.getItem("results");
+        var rname = get_date_string();
+        if(rindex == undefined) {
+            rindex = new Array();
+            rindex.push([rname, g_graphdata]);
+        } else {
+            rindex = JSON.parse(rindex);
+            rindex.push([rname, g_graphdata]);
+        }
+        try {
+            localStorage.setItem("results", JSON.stringify(rindex));
+        } catch(err) { // neglect errors.
+            post_status("抱歉，无法存储当前结果，可能是存储空间不足，请删除一些以前的数据再试。", "error");
+        };
+        show_result(g_graphdata);
+        post_status("[完成] 将进入好友关系图页面。", "info");
+        //swtab("graph");
+        xnana_list();
+    };
+    setTimeout(function() {
+        var ctx = jsfr_initialize(n, edges, {
+            size : Math.sqrt(n) * 70
+        });
+        var n_iter = n * 2;
+        var iter_num = 0;
+        var timer = setInterval(function() {
+            if(iter_num >= n_iter) {
+                clearInterval(timer);
+                R = ctx.nodes;
+                $(".progress").removeClass("progress").html("完成");
+                post_status("步骤 4/4: 正在绘制关系图...", "title");
+                setTimeout(onlayoutend(), 10);
+            } else {
+                for(var i = 0; i < 10; i++)
+                    ctx.iterate();
+                $(".progress").html((iter_num + 1) + "/" + n_iter);
+                iter_num += 10;
+            }
+        }, 10);
+    }, 30);
+}
+function xnana_listact(rname, act) {
+    if(act == "show") {
+        var rindex = localStorage.getItem("results");
+        if(rindex != undefined) {
+            rindex = JSON.parse(rindex);
+            for(i in rindex) {
+                var trname = rindex[i][0];
+                if(trname == rname) {
+                    show_result(rindex[i][1]);
+                    swtab("graph");
+                    return;
+                }
+            }
+        }
+    }
+    if(act == "remove") {
+        var ans = confirm("真的要删除 '"+rname+"' 吗？");
+        if(!ans) return;
+        var rindex = localStorage.getItem("results");
+        var nindex = new Array();
+        if(rindex != undefined) {
+            rindex = JSON.parse(rindex);
+            for(i in rindex) {
+                var trname = rindex[i][0];
+                if(trname != rname) {
+                    nindex.push(rindex[i]);
+                }
+            }
+        }
+        localStorage.setItem("results", JSON.stringify(nindex));
+        xnana_list();
+    }
+    if(act == "rename") {
+        var ans = prompt("请输入新的名称：");
+        if(ans == null) return;
+        ans = $.trim(ans);
+        if(ans == "") return;
+        var rindex = localStorage.getItem("results");
+        if(rindex != undefined) {
+            rindex = JSON.parse(rindex);
+            for(i in rindex) {
+                var trname = rindex[i][0];
+                if(trname == rname) {
+                    rindex[i][0] = ans;
+                }
+            }
+        }
+        localStorage.setItem("results", JSON.stringify(rindex));
+        xnana_list();
+    }
+}
+function xnana_list() {
+    var ht = "";
+    var rindex = localStorage.getItem("results");
+    if(rindex != undefined) {
+        rindex = JSON.parse(rindex);
+        for(i in rindex) {
+            var rname = rindex[i][0];
+            var aa = '<a href="#" onclick="xnana_listact(\''+rname+'\',\'show\');return false;">显示</a>';
+            aa += '   <a href="#" onclick="xnana_listact(\''+rname+'\',\'rename\');return false;">重命名</a>';
+            aa += '   <a href="#" onclick="xnana_listact(\''+rname+'\',\'remove\');return false;">删除</a>';
+            ht += "<tr><td>"+rname+"</td><td class=\"controls\">"+aa+"</td></tr>";
+        }
+    }
+    if(rindex.length > 50) {
+        ht += "<tr><td>无法存储太多关系图，请删除一些。</td><td></td></tr>";
+    }
+    document.getElementById("resultsTable").innerHTML = ht;
+}
+function swtab(s) {
+    $('.page_tab').css('display', 'none');
+    $('#tab_'+s).css('display','block');
+}
+
+function show_result(dat) {
+    var i_wh = 1;
+    var i_scale = i_wh;
+    var use_image = true;
+    var friends = dat.friends;
+    var g_width = dat.layout.g_width;
+    var g_height = dat.layout.g_height;
+    var n_edges = dat.layout.n_edges;
+    var n_nodes = dat.layout.n_nodes;
+    var e_data = dat.layout.e_data;
+    var n_data = dat.layout.n_data;
+    /*
+    $("#statNNodes").html(n_nodes);
+    $("#statNEdges").html(n_edges);
+    var ht = "";
+    for(i in dat.betw) {
+        var l = dat.betw[i];
+        ht += "<tr><td>"+Math.log(1.0+l[0]).toPrecision(4)+'</td><td><a href="#" class="td-'+l[1]+'">'+friends[l[1]][1]+'</a></td><td><a href="#" class="td-'+l[2]+'">'+friends[l[2]][1]+"</a></td></tr>";
+    }
+    $("#statEdgeRank").html(ht);*/
+    var holder = document.getElementById('canvas_holder');
+    var canvas = document.getElementById('canvas_graph');
+    var mask = document.getElementById('canvas_mask');
+    var c = canvas.getContext('2d');
+    var cmask = mask.getContext('2d');
+    var middle = document.getElementById('middle_layer');
+    var imgs = document.getElementById('canvas_images');
+    var current_active_idx = -1;
+    imgs.innerHTML = "";
+    mask.width = canvas.width = g_width * i_scale;
+    mask.height = canvas.height = g_height * i_scale;
+    middle.style.width = imgs.style.width = holder.style.width = g_width * i_scale + "px";
+    middle.style.height = imgs.style.height = holder.style.height = g_height * i_scale + "px";
+    var draw_graph = function() {
+        c.clearRect(0, 0, g_width * i_scale, g_height * i_scale);    
+        for(var i = 0; i < n_edges; i++) {
+            c.beginPath();
+            c.moveTo(i_scale * n_data[e_data[i][0]][0], i_scale * n_data[e_data[i][0]][1]);
+            c.lineTo(i_scale * n_data[e_data[i][1]][0], i_scale * n_data[e_data[i][1]][1]);
+            c.strokeStyle = 'rgba(150,150,150,0.1)';
+            c.stroke();
+        }
+        c.strokeStyle = 'rgba(0,0,0,1)';
+        c.fillStyle = 'rgba(255,255,255,1)';
+        for(var i = 0; i < n_nodes; i++) {
+            x = n_data[i][0] * i_scale;
+            y = n_data[i][1] * i_scale;
+            c.fillStyle = 'rgba(255,255,255,1)';
+            c.beginPath();
+            c.arc(x, y, 2, 0, Math.PI * 2, true);
+            c.closePath();
+            c.fill();
+            c.fillStyle = 'rgba(0,0,0,1)';
+            c.stroke();
+        }
+    };
+    var draw_mask = function(idx) {
+        current_active_idx = idx;
+        cmask.clearRect(0, 0, g_width * i_scale, g_height * i_scale);
+        for(ei = 0; ei < n_edges; ei++) {
+            var tov = undefined;
+            if(e_data[ei][0] == idx) tov = e_data[ei][1];
+            if(e_data[ei][1] == idx) tov = e_data[ei][0];
+            if(tov != undefined) {
+                cmask.beginPath();
+                cmask.moveTo(i_scale * n_data[idx][0], i_scale * n_data[idx][1]);
+                cmask.lineTo(i_scale * n_data[tov][0], i_scale * n_data[tov][1]);
+                cmask.strokeStyle = 'rgba(255,127,14,0.8)';
+                cmask.stroke();
+                $('#person-' + tov).removeClass('inactive');
+                $('#person-' + tov).addClass('selected');
+            }
+        }
+    }
+    draw_graph();
+    for(var i = 0; i < n_nodes; i++) {
+        x = n_data[i][0] * i_scale;
+        y = n_data[i][1] * i_scale;
+        if(use_image) {
+            subnode = document.createElement('div');
+            pnode = document.createElement('div');
+            pnode.appendChild(subnode);
+            pnode.id = "person-"+i;
+            pnode.className = "person-box";
+            tg = document.createElement('span');
+            tg.innerHTML = friends[i][1];
+            var image = new Image();
+            image.src = friends[i][2];
+            image.id = "personimg-"+i;
+            pnode.style.left = x + "px";
+            pnode.style.top = y + "px";
+            subnode.appendChild(image);
+            subnode.appendChild(tg);
+            imgs.appendChild(pnode);
+            subnode.__index = i;
+            pnode.__index = i;
+            subnode.onclick = function() {
+
+            };
+            pnode.onmousedown = function() {
+                var idx = this.__index;
+                $('.person-box').removeClass('selected');
+                $('.person-box').addClass('inactive');
+                draw_mask(idx);
+                $('#person-' + idx).removeClass('inactive');
+                $('#person-' + idx).addClass('selected');
+                $('#middle_layer').removeClass('invisible');
+                
+                this._startx = parseInt(this.style.left.replace('px',''));
+                this._starty = parseInt(this.style.top.replace('px',''));
+                var e = window.event;
+                this._mousex = e.screenX;
+                this._mousey = e.screenY;
+                this._dragging = true;
+                window._draggingobj = this;
+                e.preventDefault();
+            }
+            $('a.td-'+i).click(function() {
+                var idx = this.__index;
+                $('.person-box').removeClass('selected');
+                $('.person-box').addClass('inactive');
+                draw_mask(idx);
+                $('#person-' + idx).removeClass('inactive');
+                $('#person-' + idx).addClass('selected');
+                $('#middle_layer').removeClass('invisible');
+            });
+            $('a.td-'+i).each(function() {
+                this.__index = i;
+            });
+        }
+    }
+    window.onmousemove = function() {
+        if(window._draggingobj != undefined) {
+            var e = window.event;
+            var x = window._draggingobj._startx + e.screenX - window._draggingobj._mousex;
+            var y = window._draggingobj._starty + e.screenY - window._draggingobj._mousey;
+            window._draggingobj.style.left = x + "px";
+            window._draggingobj.style.top = y + "px";
+            n_data[window._draggingobj.__index][0] = x / i_scale;
+            n_data[window._draggingobj.__index][1] = y / i_scale;
+            draw_mask(window._draggingobj.__index);
+        }
+    }
+    window.onmouseup = function() {
+        window._draggingobj = undefined;
+    }
+    $('#canvas_mask').unbind('click');
+    $('#canvas_mask').click(function() {
+        cmask.clearRect(0, 0, g_width * i_scale, g_height * i_scale);
+        current_active_idx = -1;
+        $('.person-box').removeClass('inactive');
+        $('.person-box').removeClass('selected');
+        $('#middle_layer').addClass('invisible');
+        return false;
+    });
+    document.getElementById('redraw-graph').onclick = function() {
+        draw_graph();
+        return false;
+    }
+    document.getElementById('save-copy').onclick = function() {
+        var rindex = localStorage.getItem("results");
+        var rname = get_date_string();
+        dat.layout.n_data = n_data;
+        if(rindex == undefined) {
+            rindex = new Array();
+            rindex.push([rname, dat]);
+        } else {
+            rindex = JSON.parse(rindex);
+            rindex.push([rname, dat]);
+        }
+        localStorage.setItem("results", JSON.stringify(rindex));
+        xnana_list();
+        return false;
+    }
+    document.getElementById('save-png').onclick = function() {
+        var cav = document.getElementById('canvas_hidden');
+        cav.width = g_width * i_scale;
+        cav.height = g_height * i_scale;
+        var c = cav.getContext('2d');
+        c.fillStyle = "rgba(255,255,255,1)";
+        c.fillRect(0, 0, g_width * i_scale, g_height * i_scale);
+        for(var i = 0; i < n_edges; i++) {
+            c.beginPath();
+            c.moveTo(i_scale * n_data[e_data[i][0]][0], i_scale * n_data[e_data[i][0]][1]);
+            c.lineTo(i_scale * n_data[e_data[i][1]][0], i_scale * n_data[e_data[i][1]][1]);
+            c.strokeStyle = 'rgba(150,150,150,0.1)';
+            c.stroke();
+        }
+        c.strokeStyle = 'rgba(0,0,0,1)';
+        c.fillStyle = 'rgba(255,255,255,1)';
+        for(var i = 0; i < n_nodes; i++) {
+            x = n_data[i][0] * i_scale;
+            y = n_data[i][1] * i_scale;
+            c.fillStyle = 'rgba(255,255,255,1)';
+            c.beginPath();
+            c.arc(x, y, 2, 0, Math.PI * 2, true);
+            c.closePath();
+            c.fill();
+            c.fillStyle = 'rgba(0,0,0,1)';
+            c.stroke();
+        }
+        var selected = [];
+        for(var i = 0; i < n_nodes; i++) {
+            selected[i] = false;
+        }
+        if(current_active_idx != -1) {
+            var idx = current_active_idx;
+            var cmask = c;
+            for(ei = 0; ei < n_edges; ei++) {
+                var tov = undefined;
+                if(e_data[ei][0] == idx) tov = e_data[ei][1];
+                if(e_data[ei][1] == idx) tov = e_data[ei][0];
+                selected[tov] = true;
+                if(tov != undefined) {
+                    cmask.beginPath();
+                    cmask.moveTo(i_scale * n_data[idx][0], i_scale * n_data[idx][1]);
+                    cmask.lineTo(i_scale * n_data[tov][0], i_scale * n_data[tov][1]);
+                    cmask.strokeStyle = 'rgba(255,127,14,0.8)';
+                    cmask.stroke();
+                }
+            }
+        }
+        for(var i = 0; i < n_nodes; i++) {
+            var x = n_data[i][0] * i_scale;
+            var y = n_data[i][1] * i_scale;
+            var name = friends[i][1];
+            var iw = 22;
+            var ih = 22;
+            c.textAlign = 'center';
+            c.font = "12px";
+            c.strokeStyle = "rgba(0,0,0,1)";
+            c.fillStyle = "rgba(0,0,0,1)";
+            c.shadowBlur = 2;
+            c.shadowOffsetX = 0;
+            c.shadowOffsetY = 0;
+            c.shadowColor = "rgba(0, 0, 0, 0.8)";
+            if(i == current_active_idx) {
+                iw = 36; ih = 36;
+                c.shadowColor = "rgba(255,127,14, 0.8)";
+                c.fillStyle = "rgba(255,0,0,1)";
+            } else if(selected[i]) {
+                c.shadowColor = "rgba(255,127,14, 0.8)";
+                c.fillStyle = "rgba(255,0,0,1)";
+            }
+            var img = document.getElementById('personimg-'+i);
+            c.shadowBlur = 3;
+            c.drawImage(img, x - iw / 2, y - ih / 2, iw, ih);
+            c.shadowBlur = 2;
+            c.fillText(name, x, y + iw / 2 + 12);
+        }
+        c.font = "18px";
+        c.textAlign = 'right';
+        c.strokeStyle = "rgba(0,0,0,1)";
+        c.shadowColor = "rgba(0, 0, 0, 0)";
+        var cpr = "Generated by XNAnanysis.";
+        c.fillText(cpr, g_width * i_scale - 12, g_height * i_scale - 12);
+        var dataurl = cav.toDataURL('image/jpeg');
+        if(dataurl.length > 5 * 1000 * 1000) { // too long!
+            dataurl = "";
+            dataurl = cav.toDataURL('image/jpeg', 0.2);
+            if(dataurl.length > 5 * 1000 * 1000) {
+                alert("对不起，图像太大了，无法直接保存。请自行截图。");
+            } else {
+                window.open(dataurl);
+            }
+        } else {
+            window.open(dataurl);
+        }
+    };
+}
+xnana_list();
+</script>
+</body>
+</html>
+<!--
+Copyright 2010-2011 windwish.net
+End of Code ~(^_^)~ 
+-->

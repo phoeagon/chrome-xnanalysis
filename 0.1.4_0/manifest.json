@@ -1,0 +1,17 @@
+{
+   "background_page": "bg.html",
+   "description": "Visualize your connections on renren.com",
+   "icons": {
+      "128": "icon-128.png",
+      "16": "icon-16.png",
+      "48": "icon-48.png"
+   },
+   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDeb3S0PrM03pd3Ol7bw1JlIae1lpZ7xBJqDt1UAVZRYQK2mkZXpWRvqEKxjz3Niuqxw5+0It/3wbSi5W02+LUZ88XQhDMeeT3OhRM/UIS81N5GjTSwADAi/2DZqSaSwYxG7DAc05MInpvttWe9m0do0K7TxK9X2Ahe5EYPlNvW3QIDAQAB",
+   "name": "xnanalysis",
+   "page_action": {
+      "default_icon": "icon-19.png",
+      "default_title": "xnanalysis"
+   },
+   "permissions": [ "tabs", "unlimitedStorage", "http://*.renren.com/", "http://*.xnimg.cn/", "http://*.xiaonei.com/" ],
+   "version": "0.1.4"
+}
