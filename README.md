@@ -15,3 +15,9 @@ failed nevertheless.
 
 If you are the original author, and disagrees with this github repo, please
 contact me and I would delete it.
+
+## Installation
+Create a folder `lnhickcbapflghfffpldgjifgibcemap` under `~/.config/google-chrome/Default/Extensions/` (on Linux) or under corresponding `Extensions` directory on other platforms.
+Copy what ever in this repo into that directory.
+
+Restart your Chrome to see the plugin.
