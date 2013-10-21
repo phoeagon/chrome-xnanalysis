@@ -14,8 +14,7 @@ An updated version by the original author has been uploaded to a repo on
 github [here](https://github.com/windwish/XNAnalysis2). Improvements implemented here are by no means connected to those
 enhancements there and I'm not responsible for whatever update taken place there.
 
-<s>Before posting it here, I've been trying to reach the original user but
-failed nevertheless.</s>
+~~Before posting it here, I've been trying to reach the original user but failed nevertheless.~~
 
 
 
