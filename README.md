@@ -10,11 +10,14 @@ This project is a Chrome extension that visualizes connection network.
 
 The original version is found on [XNAnalysis - Donghao Ren](http://donghaoren.org/projects/xnanalysis). But has lost traces.
 
-Before posting it here, I've been trying to reach the original user but
-failed nevertheless.
+An updated version by the original author has been uploaded to a repo on 
+github [here](https://github.com/windwish/XNAnalysis2). Improvements implemented here are by no means connected to those
+enhancements there and I'm not responsible for whatever update taken place there.
 
-If you are the original author, and disagrees with this github repo, please
-contact me and I would delete it.
+<s>Before posting it here, I've been trying to reach the original user but
+failed nevertheless.</s>
+
+
 
 ## Installation
 Create a folder `lnhickcbapflghfffpldgjifgibcemap` under `~/.config/google-chrome/Default/Extensions/` (on Linux) or under corresponding `Extensions` directory on other platforms.
